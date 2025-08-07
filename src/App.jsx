@@ -1,9 +1,147 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 
+// Data Input Form Component
+function DataInputForm({ currentData, onSubmit, onCancel }) {
+  const [formData, setFormData] = useState(currentData)
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    onSubmit(formData)
+  }
+
+  const handleChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: parseFloat(value) || 0 }))
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="data-input-form">
+      <div className="form-row">
+        <div className="form-group">
+          <label>YTD Return (%)</label>
+          <input
+            type="number"
+            step="0.1"
+            value={formData.ytdReturn}
+            onChange={(e) => handleChange('ytdReturn', e.target.value)}
+            placeholder="12.4"
+          />
+        </div>
+        <div className="form-group">
+          <label>Annualized Return (%)</label>
+          <input
+            type="number"
+            step="0.1"
+            value={formData.annualizedReturn}
+            onChange={(e) => handleChange('annualizedReturn', e.target.value)}
+            placeholder="15.7"
+          />
+        </div>
+        <div className="form-group">
+          <label>Since Inception (%)</label>
+          <input
+            type="number"
+            step="0.1"
+            value={formData.inceptionReturn}
+            onChange={(e) => handleChange('inceptionReturn', e.target.value)}
+            placeholder="142"
+          />
+        </div>
+      </div>
+      
+      <div className="form-row">
+        <div className="form-group">
+          <label>Sharpe Ratio</label>
+          <input
+            type="number"
+            step="0.01"
+            value={formData.sharpeRatio}
+            onChange={(e) => handleChange('sharpeRatio', e.target.value)}
+            placeholder="1.85"
+          />
+        </div>
+        <div className="form-group">
+          <label>Max Drawdown (%)</label>
+          <input
+            type="number"
+            step="0.1"
+            value={formData.maxDrawdown}
+            onChange={(e) => handleChange('maxDrawdown', e.target.value)}
+            placeholder="-4.2"
+          />
+        </div>
+        <div className="form-group">
+          <label>Volatility (%)</label>
+          <input
+            type="number"
+            step="0.1"
+            value={formData.volatility}
+            onChange={(e) => handleChange('volatility', e.target.value)}
+            placeholder="8.5"
+          />
+        </div>
+      </div>
+      
+      <div className="form-row">
+        <div className="form-group">
+          <label>Number of Positions</label>
+          <input
+            type="number"
+            value={formData.positions}
+            onChange={(e) => handleChange('positions', e.target.value)}
+            placeholder="85"
+          />
+        </div>
+        <div className="form-group">
+          <label>Net Exposure (%)</label>
+          <input
+            type="number"
+            step="0.1"
+            value={formData.netExposure}
+            onChange={(e) => handleChange('netExposure', e.target.value)}
+            placeholder="0"
+          />
+        </div>
+        <div className="form-group">
+          <label>Gross Exposure (%)</label>
+          <input
+            type="number"
+            step="0.1"
+            value={formData.grossExposure}
+            onChange={(e) => handleChange('grossExposure', e.target.value)}
+            placeholder="180"
+          />
+        </div>
+      </div>
+      
+      <div className="form-actions">
+        <button type="button" onClick={onCancel} className="cancel-btn">
+          Cancel
+        </button>
+        <button type="submit" className="submit-btn">
+          Update Data
+        </button>
+      </div>
+    </form>
+  )
+}
+
 function App() {
   const [currentTime, setCurrentTime] = useState(new Date())
   const [isLoading, setIsLoading] = useState(true)
+  const [performanceData, setPerformanceData] = useState({
+    ytdReturn: 12.4,
+    annualizedReturn: 15.7,
+    inceptionReturn: 142,
+    sharpeRatio: 1.85,
+    maxDrawdown: -4.2,
+    volatility: 8.5,
+    positions: 85,
+    netExposure: 0,
+    grossExposure: 180,
+    lastUpdated: new Date().toLocaleDateString()
+  })
+  const [showDataInput, setShowDataInput] = useState(false)
 
   useEffect(() => {
     // Update time every second
@@ -21,6 +159,11 @@ function App() {
       clearTimeout(loadingTimer)
     }
   }, [])
+
+  const handleDataUpdate = (newData) => {
+    setPerformanceData({ ...performanceData, ...newData, lastUpdated: new Date().toLocaleDateString() })
+    setShowDataInput(false)
+  }
 
   if (isLoading) {
     return (
@@ -193,21 +336,44 @@ function App() {
       {/* Performance Section */}
       <section id="performance" className="section performance-section">
         <div className="container">
-          <h2>Performance Overview</h2>
+          <div className="performance-header">
+            <h2>Performance Overview</h2>
+            <button 
+              className="update-data-btn"
+              onClick={() => setShowDataInput(true)}
+            >
+              Update Data
+            </button>
+          </div>
+          
+          {showDataInput && (
+            <div className="data-input-modal">
+              <div className="data-input-content">
+                <h3>Update Performance Data</h3>
+                <p>Enter your Interactive Brokers portfolio data:</p>
+                <DataInputForm 
+                  currentData={performanceData}
+                  onSubmit={handleDataUpdate}
+                  onCancel={() => setShowDataInput(false)}
+                />
+              </div>
+            </div>
+          )}
+          
           <div className="performance-grid">
             <div className="performance-card">
               <h3>Risk Metrics</h3>
               <div className="metric">
                 <span className="metric-label">Sharpe Ratio</span>
-                <span className="metric-value">1.85</span>
+                <span className="metric-value">{performanceData.sharpeRatio}</span>
               </div>
               <div className="metric">
                 <span className="metric-label">Max Drawdown</span>
-                <span className="metric-value">-4.2%</span>
+                <span className="metric-value">{performanceData.maxDrawdown}%</span>
               </div>
               <div className="metric">
                 <span className="metric-label">Volatility</span>
-                <span className="metric-value">8.5%</span>
+                <span className="metric-value">{performanceData.volatility}%</span>
               </div>
             </div>
             
@@ -215,15 +381,15 @@ function App() {
               <h3>Returns</h3>
               <div className="metric">
                 <span className="metric-label">YTD Return</span>
-                <span className="metric-value positive">+12.4%</span>
+                <span className="metric-value positive">+{performanceData.ytdReturn}%</span>
               </div>
               <div className="metric">
                 <span className="metric-label">Annualized</span>
-                <span className="metric-value positive">+15.7%</span>
+                <span className="metric-value positive">+{performanceData.annualizedReturn}%</span>
               </div>
               <div className="metric">
                 <span className="metric-label">Since Inception</span>
-                <span className="metric-value positive">+142%</span>
+                <span className="metric-value positive">+{performanceData.inceptionReturn}%</span>
               </div>
             </div>
             
@@ -231,17 +397,22 @@ function App() {
               <h3>Portfolio Stats</h3>
               <div className="metric">
                 <span className="metric-label">Positions</span>
-                <span className="metric-value">85</span>
+                <span className="metric-value">{performanceData.positions}</span>
               </div>
               <div className="metric">
                 <span className="metric-label">Net Exposure</span>
-                <span className="metric-value">0%</span>
+                <span className="metric-value">{performanceData.netExposure}%</span>
               </div>
               <div className="metric">
                 <span className="metric-label">Gross Exposure</span>
-                <span className="metric-value">180%</span>
+                <span className="metric-value">{performanceData.grossExposure}%</span>
               </div>
             </div>
+          </div>
+          
+          <div className="data-source">
+            <p>Last updated: {performanceData.lastUpdated}</p>
+            <p>Data source: Interactive Brokers Portfolio Analyst</p>
           </div>
         </div>
       </section>
