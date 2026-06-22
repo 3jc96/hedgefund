@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FX Admin</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; margin: 24px; background: #0b1020; color: #e6e9ef; }
+      h1 { margin-top: 0; font-size: 22px; }
+      .muted { color: #9fb0d0; font-size: 13px; }
+      table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+      th, td { text-align: left; padding: 10px; border-bottom: 1px solid #273055; vertical-align: top; }
+      .row { background: #121833; }
+      .rate { padding: 8px 10px; background: #0e1430; border: 1px solid #273055; border-radius: 8px; display: inline-block; }
+      form.inline { display: grid; grid-template-columns: 140px 1fr 100px; gap: 8px; margin-top: 8px; }
+      input, textarea { width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid #2e3a66; background: #0e1430; color: #e6e9ef; }
+      button { padding: 10px 12px; border-radius: 8px; border: 0; background: #22c55e; color: white; font-weight: 600; cursor: pointer; }
+      code { background: #0e1430; padding: 2px 6px; border-radius: 6px; }
+    </style>
+  </head>
+  <body>
+    <h1>FX Requests</h1>
+    <div class="rate">Current USD/SGD: <strong>{{ '%.6f' % rate if rate else 'N/A' }}</strong></div>
+    <div class="muted">Provide offers and a short message. Link: /admin/fx?token=YOUR_TOKEN</div>
+    <table>
+      <thead>
+        <tr>
+          <th>When</th>
+          <th>Client</th>
+          <th>Direction & Amount</th>
+          <th>Reference</th>
+          <th>Status</th>
+          <th>Quote</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for it in items %}
+        <tr class="row">
+          <td>
+            <div>{{ it.created_at }}</div>
+            <div class="muted"><code>{{ it.id }}</code></div>
+          </td>
+          <td>
+            <div>{{ it.name }} — {{ it.email }}</div>
+            {% if it.note %}<div class="muted">{{ it.note }}</div>{% endif %}
+          </td>
+          <td>{{ it.direction }}<br/>{{ '%.2f' % it.amount }}</td>
+          <td>{{ it.reference_rate }}</td>
+          <td>
+            {{ it.status }}
+            {% if it.offered_rate %}<div class="muted">Offered: {{ it.offered_rate }}</div>{% endif %}
+          </td>
+          <td>
+            <form method="post" action="/admin/fx/respond" class="inline">
+              <input type="hidden" name="id" value="{{ it.id }}" />
+              <input type="hidden" name="token" value="{{ token }}" />
+              <input name="offered_rate" placeholder="Rate e.g. 1.3456" />
+              <input name="message" placeholder="Message to client" />
+              <button type="submit">Send Quote</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+  </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

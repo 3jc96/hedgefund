@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .debug-info {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .test-button {
+            background: #00d4aa;
+            color: #000;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        
+        .test-button:hover {
+            background: #00b894;
+        }
+        
+        #console-output {
+            background: #000;
+            color: #00ff00;
+            padding: 1rem;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-info">
+        <h2>🔧 JavaScript Debug</h2>
+        <p>Testing basic functionality...</p>
+    </div>
+    
+    <button class="test-button" onclick="testBasicJS()">Test Basic JavaScript</button>
+    <button class="test-button" onclick="testFetch()">Test Fetch API</button>
+    <button class="test-button" onclick="testPortfolio()">Test Portfolio API</button>
+    <button class="test-button" onclick="testMarketData()">Test Market Data API</button>
+    
+    <div id="console-output"></div>
+    
+    <script>
+        // Override console.log to capture output
+        const originalLog = console.log;
+        const originalError = console.error;
+        const outputDiv = document.getElementById('console-output');
+        
+        function log(message) {
+            originalLog(message);
+            outputDiv.textContent += message + '\n';
+        }
+        
+        function logError(message) {
+            originalError(message);
+            outputDiv.textContent += 'ERROR: ' + message + '\n';
+        }
+        
+        console.log = log;
+        console.error = logError;
+        
+        // Test basic JavaScript
+        function testBasicJS() {
+            log('Testing basic JavaScript...');
+            try {
+                const test = 'Hello World';
+                log('✓ Basic JavaScript works: ' + test);
+            } catch (error) {
+                logError('✗ Basic JavaScript failed: ' + error.message);
+            }
+        }
+        
+        // Test fetch API
+        async function testFetch() {
+            log('Testing fetch API...');
+            try {
+                const response = await fetch('/api/portfolio');
+                const data = await response.json();
+                log('✓ Fetch API works: ' + JSON.stringify(data).substring(0, 100) + '...');
+            } catch (error) {
+                logError('✗ Fetch API failed: ' + error.message);
+            }
+        }
+        
+        // Test portfolio API
+        async function testPortfolio() {
+            log('Testing portfolio API...');
+            try {
+                const response = await fetch('/api/portfolio');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                const data = await response.json();
+                log('✓ Portfolio API works: ' + data.stocks.length + ' stocks, ' + data.commodities.length + ' commodities');
+            } catch (error) {
+                logError('✗ Portfolio API failed: ' + error.message);
+            }
+        }
+        
+        // Test market data API
+        async function testMarketData() {
+            log('Testing market data API...');
+            try {
+                const response = await fetch('/api/market-data');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                const data = await response.json();
+                log('✓ Market data API works: ' + Object.keys(data).length + ' symbols');
+            } catch (error) {
+                logError('✗ Market data API failed: ' + error.message);
+            }
+        }
+        
+        // Auto-run tests on load
+        window.addEventListener('load', function() {
+            log('Page loaded, running tests...');
+            setTimeout(testBasicJS, 500);
+            setTimeout(testFetch, 1000);
+            setTimeout(testPortfolio, 1500);
+            setTimeout(testMarketData, 2000);
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

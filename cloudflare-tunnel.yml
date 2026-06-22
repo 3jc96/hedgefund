@@ -1,0 +1,9 @@
+tunnel: f78a95c2-e669-4884-a90e-6ea49a609fa9
+credentials-file: /Users/joelchu/.cloudflared/f78a95c2-e669-4884-a90e-6ea49a609fa9.json
+
+ingress:
+  - hostname: quantumnews-ps23.3jcllc.com
+    service: http://localhost:5001
+  - hostname: petty-cash.trycloudflare.com
+    service: http://localhost:5050
+  - service: http_status:404

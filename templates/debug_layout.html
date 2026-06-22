@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .debug-info {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .dashboard-grid {
+            display: grid !important;
+            grid-template-columns: 0.4fr 0.6fr !important;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .left-column {
+            background: rgba(0, 212, 170, 0.1);
+            border: 2px solid #00d4aa;
+            border-radius: 10px;
+            padding: 1rem;
+            min-height: 200px;
+        }
+        
+        .right-column {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #ffffff;
+            border-radius: 10px;
+            padding: 1rem;
+            min-height: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-info">
+        <h2>🔧 CSS Debug</h2>
+        <p><strong>Expected:</strong> 40% left, 60% right</p>
+        <p><strong>Actual:</strong> <span id="actual">Loading...</span></p>
+        <p><strong>CSS Applied:</strong> <span id="css-applied">Loading...</span></p>
+    </div>
+    
+    <div class="dashboard-grid">
+        <div class="left-column">
+            <h3>Left Column (40%)</h3>
+            <p>This should be 40% of the screen width.</p>
+        </div>
+        
+        <div class="right-column">
+            <h3>Right Column (60%)</h3>
+            <p>This should be 60% of the screen width.</p>
+        </div>
+    </div>
+    
+    <script>
+        function checkLayout() {
+            const grid = document.querySelector('.dashboard-grid');
+            const leftCol = document.querySelector('.left-column');
+            const rightCol = document.querySelector('.right-column');
+            
+            const computedStyle = window.getComputedStyle(grid);
+            const leftWidth = leftCol.offsetWidth;
+            const rightWidth = rightCol.offsetWidth;
+            const totalWidth = leftWidth + rightWidth;
+            const leftPercent = Math.round((leftWidth / totalWidth) * 100);
+            const rightPercent = Math.round((rightWidth / totalWidth) * 100);
+            
+            document.getElementById('actual').textContent = `Left: ${leftPercent}%, Right: ${rightPercent}%`;
+            document.getElementById('css-applied').textContent = computedStyle.gridTemplateColumns;
+            
+            console.log('Grid CSS:', computedStyle.gridTemplateColumns);
+            console.log('Left width:', leftWidth, 'px');
+            console.log('Right width:', rightWidth, 'px');
+            console.log('Left %:', leftPercent);
+            console.log('Right %:', rightPercent);
+        }
+        
+        window.addEventListener('load', checkLayout);
+        window.addEventListener('resize', checkLayout);
+    </script>
+</body>
+</html>

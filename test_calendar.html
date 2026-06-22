@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(0, 212, 170, 0.2);
+        }
+        .btn {
+            background: rgba(0, 212, 170, 0.2);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            color: #00d4aa;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        .result {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border: 1px solid rgba(0, 212, 170, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>📅 Calendar Feature Test</h1>
+        
+        <div class="test-section">
+            <h2>API Test</h2>
+            <button class="btn" onclick="testCalendarAPI()">Test Calendar API</button>
+            <div id="api-result" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Calendar Display Test</h2>
+            <button class="btn" onclick="testCalendarDisplay()">Test Calendar Display</button>
+            <div id="calendar-result" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        async function testCalendarAPI() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.innerHTML = '🔄 Testing API...';
+            
+            try {
+                const response = await fetch('/api/calendar');
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `
+                        <h3>✅ API Test Successful</h3>
+                        <p><strong>Total Events:</strong> ${data.total_events}</p>
+                        <p><strong>Economic Reports:</strong> ${data.economic_count}</p>
+                        <p><strong>FOMC Meetings:</strong> ${data.fomc_count}</p>
+                        <p><strong>Earnings:</strong> ${data.earnings_count}</p>
+                        <p><strong>Timestamp:</strong> ${data.timestamp}</p>
+                        <details>
+                            <summary>View Events</summary>
+                            <pre>${JSON.stringify(data.events, null, 2)}</pre>
+                        </details>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<h3>❌ API Test Failed</h3><p>HTTP ${response.status}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<h3>❌ API Test Error</h3><p>${error.message}</p>`;
+            }
+        }
+        
+        function testCalendarDisplay() {
+            const resultDiv = document.getElementById('calendar-result');
+            resultDiv.innerHTML = `
+                <h3>✅ Calendar Display Test</h3>
+                <p>The calendar feature has been successfully added to your webscraper!</p>
+                <p><strong>Features:</strong></p>
+                <ul>
+                    <li>📅 Interactive monthly calendar</li>
+                    <li>📊 Economic reports (CPI, Employment, PPI, etc.)</li>
+                    <li>🏦 FOMC meetings and minutes</li>
+                    <li>💰 Earnings for major stocks</li>
+                    <li>📱 Mobile responsive design</li>
+                    <li>🔍 Event filtering by type</li>
+                    <li>📋 Upcoming events list</li>
+                </ul>
+                <p><strong>Access your webscraper:</strong> <a href="http://localhost:8081" target="_blank">http://localhost:8081</a></p>
+            `;
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,169 @@
+version: '3.8'
+
+services:
+  # Java Risk Engine
+  risk-engine:
+    build:
+      context: ./java-engine
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/quantrisk
+      - SPRING_DATASOURCE_USERNAME=quantrisk
+      - SPRING_DATASOURCE_PASSWORD=quantrisk123
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - quant-risk-network
+
+  # Python Analytics API
+  analytics-api:
+    build:
+      context: ./python-analytics
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://quantrisk:quantrisk123@postgres:5432/quantrisk
+      - REDIS_URL=redis://redis:6379
+      - IB_HOST=ib-gateway
+      - IB_PORT=4001
+    depends_on:
+      - postgres
+      - redis
+      - ib-gateway
+    volumes:
+      - ./python-analytics:/app
+      - ./logs:/app/logs
+    networks:
+      - quant-risk-network
+
+  # React Web UI
+  web-ui:
+    build:
+      context: ./web-ui
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+      - REACT_APP_RISK_ENGINE_URL=http://localhost:8080
+    depends_on:
+      - analytics-api
+      - risk-engine
+    networks:
+      - quant-risk-network
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=quantrisk
+      - POSTGRES_USER=quantrisk
+      - POSTGRES_PASSWORD=quantrisk123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - quant-risk-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - quant-risk-network
+
+  # Interactive Brokers Gateway (Paper Trading)
+  ib-gateway:
+    image: ghcr.io/UnusualAlpha/ib-gateway:latest
+    ports:
+      - "4001:4001"
+      - "4002:4002"
+    environment:
+      - TWS_USERID=your_ib_userid
+      - TWS_PASSWORD=your_ib_password
+      - TRADING_MODE=paper
+      - READ_ONLY_API=yes
+    volumes:
+      - ./docker/ib-gateway:/opt/ib-gateway
+    networks:
+      - quant-risk-network
+
+  # Airflow for Orchestration
+  airflow-webserver:
+    image: apache/airflow:2.7.1
+    command: webserver
+    ports:
+      - "8081:8080"
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__CORE__FERNET_KEY=your-fernet-key-here
+    volumes:
+      - ./airflow-dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+    depends_on:
+      - postgres
+    networks:
+      - quant-risk-network
+
+  airflow-scheduler:
+    image: apache/airflow:2.7.1
+    command: scheduler
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__CORE__FERNET_KEY=your-fernet-key-here
+    volumes:
+      - ./airflow-dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+    depends_on:
+      - postgres
+      - airflow-webserver
+    networks:
+      - quant-risk-network
+
+  # Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - quant-risk-network
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - quant-risk-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  grafana_data:
+
+networks:
+  quant-risk-network:
+    driver: bridge

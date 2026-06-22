@@ -1,0 +1,23 @@
+# Render Blueprint — Quantum Capital News (Flask)
+# Dashboard: New > Blueprint > connect this GitHub repo, or apply from repo root.
+
+services:
+  - type: web
+    name: quantum-news
+    runtime: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120 wsgi:application
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      - key: FLASK_SECRET_KEY
+        generateValue: true
+      - key: IBKR_ADMIN_TOKEN
+        generateValue: true
+      - key: ALPHA_VANTAGE_API_KEY
+        sync: false
+      - key: DATA_DIR
+        value: /tmp/quantum-news-data
