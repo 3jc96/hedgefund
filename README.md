@@ -25,6 +25,8 @@ Open http://localhost:8080 — health check at `/health`.
 
 Free tier spins down after inactivity; first request may take ~30s to wake.
 
+**Build uses Python 3.11** (`.python-version` + `runtime.txt`). If deploy fails on pandas, ensure Render is not using Python 3.14 — set `PYTHON_VERSION` to `3.11.9` under Environment.
+
 ## Deploy to GitHub
 
 From this directory:

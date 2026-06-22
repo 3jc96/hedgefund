@@ -1,0 +1,15 @@
+# Optional local/dev extras (not installed on Render)
+-r requirements.txt
+
+selenium==4.15.2
+cloudscraper==1.2.71
+pandas==2.2.3
+numpy==1.26.4
+nltk==3.8.1
+textblob==0.17.1
+sqlalchemy==2.0.19
+schedule==1.2.0
+newspaper3k==0.2.8
+goose3==3.1.19
+pytest==7.4.0
+pytest-cov==4.1.0

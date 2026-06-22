@@ -1,40 +1,21 @@
-# Web scraping and data processing
-requests==2.31.0
-beautifulsoup4==4.12.2
-selenium==4.15.2
-cloudscraper==1.2.71
-lxml==4.9.3
+# Production deps for Render (Python 3.11). yfinance pulls pandas/numpy wheels.
 
-# Data analysis and processing
-pandas==2.0.3
-numpy==1.24.3
-python-dateutil==2.8.2
+# Web
+flask==3.0.3
+flask-cors==4.0.1
+gunicorn==22.0.0
 
-# Natural language processing
-nltk==3.8.1
-textblob==0.17.1
+# HTTP / parsing
+requests==2.32.3
+beautifulsoup4==4.12.3
+lxml==5.3.0
+feedparser==6.0.11
+
+# Sentiment
 vaderSentiment==3.3.2
 
-# Web framework
-flask==2.3.2
-flask-cors==4.0.0
-gunicorn==21.2.0
+# Market data (includes compatible pandas/numpy wheels)
+yfinance==0.2.54
 
-# Database
-sqlalchemy==2.0.19
-
-# Market data
-yfinance>=0.2.40
-
-# Utilities
-python-dotenv==1.0.0
-schedule==1.2.0
-feedparser==6.0.10
-
-# Testing
-pytest==7.4.0
-pytest-cov==4.1.0
-
-# Additional scraping tools
-newspaper3k==0.2.8
-goose3==3.1.19
+# Config
+python-dotenv==1.0.1
